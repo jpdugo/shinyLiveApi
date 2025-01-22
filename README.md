@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is a simple app to demonstrate how to serve a ShinyLive site using FastAPI.
+This is a simple app to demonstrate how to serve a ShinyLive site using FastAPI. The Shiny application consists in a simple Excel file reader that allows the user to upload an Excel file, visualize its content, and download it as a CSV file.
 
 ## Instructions to Run the API
 

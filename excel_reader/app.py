@@ -1,4 +1,4 @@
-from shiny import App, ui, render, reactive
+from shiny import App, Inputs, Outputs, Session, reactive, render, req, ui
 import pandas as pd
 from pathlib import Path
 import tempfile
@@ -11,22 +11,24 @@ app_ui = ui.page_fluid(
         ui.input_text("filename", "Enter filename:", value="output.csv"),
         ui.input_text_area("text_content", "Edit content if needed:", width="100%", height="500px"),
         ui.download_button("download", "Download as TXT"),
+        ui.input_action_button("clear_file", "Clear File Input"),  # Add a button to clear the file input
     )
 )
 
-def server(input, output, session):
+def server(input: Inputs, output: Outputs, session: Session):
     excel_content = reactive.value("")
 
     @reactive.calc
     @reactive.event(input.file)
     def df_loaded():
-        if input.file() is not None:
-            # Read the uploaded Excel file
+        req(input.file())
+        try:
             file_path = input.file()[0]["datapath"]
             df = pd.read_excel(file_path)
             excel_content.set(df)
-            
-            return df.to_csv(sep = ";", index = False)
+            return df.to_csv(sep=";", index=False)
+        except Exception as e:
+            return f"Error processing file: {e}"
 
     @reactive.effect
     @reactive.event(df_loaded)
@@ -43,5 +45,10 @@ def server(input, output, session):
     def download():
         if input.file() is not None:
             yield input.text_content()
-    
+
+    @reactive.effect
+    @reactive.event(input.clear_file)  # Add an event to clear the file input
+    def _():
+        ui.update_text_area("text_content", value="")
+
 app = App(app_ui, server)

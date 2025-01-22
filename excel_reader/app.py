@@ -1,7 +1,5 @@
 from shiny import App, Inputs, Outputs, Session, reactive, render, req, ui
 import pandas as pd
-from pathlib import Path
-import tempfile
 
 app_ui = ui.page_fluid(
     ui.card(
